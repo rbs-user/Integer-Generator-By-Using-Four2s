@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Integer Generator Proof</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 50px auto;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            width: 200px;
+            padding: 5px;
+        }
+
+        input[type="submit"] {
+            padding: 5px 10px;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Integer Generator with Proof</h1>
+    <p>Enter any integer to see the algorithm generate it symbolically with proof steps.</p>
+
+    <form id="generateForm">
+        <input type="text" id="userInput" placeholder="Enter an integer" required>
+        <input type="submit" value="Generate">
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('generateForm');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            resultDiv.innerHTML = "Processing...";
+            const input = document.getElementById('userInput').value;
+
+            const formData = new FormData();
+            formData.append("user_input", input);
+
+            try {
+                const response = await fetch("/api/generate", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.innerHTML = `<p class="error">${data.error}</p>`;
+                } else {
+                    let proofText = data.proof.join("\n");
+                    resultDiv.innerHTML = `<h2>Output: ${data.output}</h2><pre>${proofText}</pre>`;
+                }
+
+            } catch (err) {
+                resultDiv.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+            }
+        });
+    </script>
+</body>
+
+</html>
